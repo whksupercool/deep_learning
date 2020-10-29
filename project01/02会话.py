@@ -13,7 +13,7 @@ with g.as_default():
     c = tf.constant(11.0)
     print(c.graph)
 
-# 实现一个假发运算
+# 实现一个加法运算
 a = tf.constant(5.0)
 b = tf.constant(6.0)
 
