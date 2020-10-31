@@ -5,6 +5,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 
+# 添加权重参数，损失值等在tensorboard观察的情况 1、收集变量2、合并变量写入事件文件
 def my_regression():
     """
     自己实现一个线性回归预测
@@ -34,8 +35,19 @@ def my_regression():
         # 4. 梯度下降优化损失, learning_rate: 0~1,2,3,5,7,10
         train_op = tf.train.GradientDescentOptimizer(0.01).minimize(loss)
 
+    # 收集tensor
+    tf.summary.scalar("losses", loss)
+    tf.summary.histogram("weight", weight)
+
+    # 定义合并tensor的op
+    merged = tf.summary.merge_all()
+
     # 定义一个初始化变量的op
     init_op = tf.global_variables_initializer()
+
+    # 定义一个保存模型的实例
+    saver = tf.train.Saver()
+
     # 通过会话运行程序
     with tf.Session() as sess:
         # 初始化变量
@@ -45,13 +57,23 @@ def my_regression():
         print("随机初始化参数权重为：%f，偏置为：%f" % (weight.eval(), bias.eval()))
 
         # 建立事件文件
-        file_writer = tf.summary.FileWriter("D:/学习/PyCharm/pycharm_project/deep_learning/summary/events/p05/",
+        file_writer = tf.summary.FileWriter("D:/学习/PyCharm/pycharm_project/deep_learning/summary/events/p06/",
                                             graph=sess.graph)
 
+        # 加载模型，覆盖模型当中随机定义的参数，从上次训练的参数结果开始
+        if os.path.exists("../summary/ckpt/p06/checkpoint"):
+            saver.restore(sess, "../summary/ckpt/p06/")
+
         # 循环训练 运行优化
-        for i in range(10000):
+        for i in range(500):
             sess.run(train_op)
+
+            # 运行合并的tensor
+            summary = sess.run(merged)
+            file_writer.add_summary(summary, i)
+
             print("第%d次优化参数权重为：%f，偏置为：%f" % (i + 1, weight.eval(), bias.eval()))
+        saver.save(sess, "../summary/ckpt/p06/")
 
     return None
 

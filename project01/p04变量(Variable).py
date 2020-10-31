@@ -24,6 +24,6 @@ with tf.Session() as sess:
     sess.run(init_op)
 
     # 把程序的图结构写入事件文件,graph：把指定的图写进事件文档中
-    file_writer = tf.summary.FileWriter("D:/学习/PyCharm/pycharm_project/deep_learning/summary/test/", graph=sess.graph)
+    file_writer = tf.summary.FileWriter("D:/学习/PyCharm/pycharm_project/deep_learning/summary/events/p04/", graph=sess.graph)
 
     print(sess.run([c, var]))
